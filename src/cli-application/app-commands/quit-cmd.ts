@@ -12,16 +12,20 @@ export class QuitCliCommand implements iCliCommand {
     name: string = "quit";
 
     displayText: string = "Quit the application.";
-    
+
     tokens: string[] = ["quit", "q"];
 
-    constructor(
-        private eventEmitter: EventEmitter
-    ) {}
-    
-    async execute(userParamsInput: {}, cliOutputter: iCliOutputter): Promise<void> {
-        cliOutputter.pushMessage("Quitting application.");
-        this.eventEmitter.emit(EVENTS.quitApp)
+    async getRequiredParams(): Promise<iCliCommandParam[] | null> {
+        return null;
     }
-    
+
+    constructor(private eventEmitter: EventEmitter) {}
+
+    async execute(
+        userParamsInput: {},
+        cliOutputter: iCliOutputter
+    ): Promise<void> {
+        cliOutputter.pushMessage("Quitting application.");
+        this.eventEmitter.emit(EVENTS.quitApp);
+    }
 }

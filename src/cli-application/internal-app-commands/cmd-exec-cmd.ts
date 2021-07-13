@@ -10,30 +10,41 @@ export class CommandExecutorCommand implements iCliCommand {
     name: string = "_cmd";
 
     displayText: string = "";
-    
+
     tokens: string[] = [];
-    
-    requiredParams?: iCliCommandParam[] | undefined = [{
-        name: "cmdNameToken",
-        displayText: "Enter the next command to execute"
-    }];
+
+    async getRequiredParams(): Promise<iCliCommandParam[] | null> {
+        return [
+            {
+                name: "cmdNameToken",
+                displayText: "Enter the next command to execute",
+            },
+        ];
+    }
 
     constructor(
         private commands: iCliCommand[],
         private cmdExecutor: iCliCommandExecutor
     ) {}
-    
-    async execute(userParamsInput: { [key: string]: any; }, cliOutputter: iCliOutputter): Promise<void> {
+
+    async execute(
+        userParamsInput: { [key: string]: any },
+        cliOutputter: iCliOutputter
+    ): Promise<void> {
         const cmdNameToken = userParamsInput.cmdNameToken.toLowerCase();
-        const cmd = this.commands.find(cmd => {
-            return cmd.name === cmdNameToken || !!cmd.tokens.find(tkn => tkn === cmdNameToken)
+        const cmd = this.commands.find((cmd) => {
+            return (
+                cmd.name === cmdNameToken ||
+                !!cmd.tokens.find((tkn) => tkn === cmdNameToken)
+            );
         });
         if (!cmd) {
-            cliOutputter.pushError(`There is no command with the name or token ${cmdNameToken}`);
+            cliOutputter.pushError(
+                `There is no command with the name or token ${cmdNameToken}`
+            );
             return;
         }
 
         await this.cmdExecutor.execute(cmd!);
     }
-    
 }

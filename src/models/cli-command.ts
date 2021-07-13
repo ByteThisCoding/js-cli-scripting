@@ -6,7 +6,7 @@ export interface iCliCommand {
     displayText: string;
     tokens: string[];
 
-    requiredParams?: iCliCommandParam[];
+    getRequiredParams(): Promise<iCliCommandParam[] | null>;
 
     execute(
         userParamsInput: { [key: string]: any },

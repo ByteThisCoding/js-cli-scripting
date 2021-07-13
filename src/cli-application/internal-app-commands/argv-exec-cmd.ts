@@ -10,22 +10,31 @@ export class ArgvCommandExecutorCommand implements iCliCommand {
     name: string = "_argv_cmd";
 
     displayText: string = "";
-    
+
     tokens: string[] = [];
 
-    constructor(
-        private commands: iCliCommand[],
-        private args: string[]
-    ) {}
-    
-    async execute(userParamsInput: {}, cliOutputter: iCliOutputter): Promise<void> {
+    async getRequiredParams(): Promise<iCliCommandParam[] | null> {
+        return null;
+    }
+
+    constructor(private commands: iCliCommand[], private args: string[]) {}
+
+    async execute(
+        userParamsInput: {},
+        cliOutputter: iCliOutputter
+    ): Promise<void> {
         const cmdNameToken = this.args[0].toLowerCase();
-        const cmd = this.commands.find(cmd => {
-            return cmd.name === cmdNameToken || !!cmd.tokens.find(tkn => tkn === cmdNameToken)
+        const cmd = this.commands.find((cmd) => {
+            return (
+                cmd.name === cmdNameToken ||
+                !!cmd.tokens.find((tkn) => tkn === cmdNameToken)
+            );
         });
-        
+
         if (!cmd) {
-            cliOutputter.pushError(`There is no command with the name or token ${cmdNameToken}`);
+            cliOutputter.pushError(
+                `There is no command with the name or token ${cmdNameToken}`
+            );
             return;
         }
 
@@ -45,10 +54,8 @@ export class ArgvCommandExecutorCommand implements iCliCommand {
             }
 
             return obj;
-
         }, {} as any);
 
         await cmd.execute(userInput, cliOutputter);
     }
-    
 }

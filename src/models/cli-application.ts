@@ -1,5 +1,6 @@
 import { iCliCommand } from "./cli-command";
 import { iCliCommandExecutor } from "./cli-command-executor";
+import { iCliCommandsCollection } from "./cli-commands-collection";
 import { iCliOutputter } from "./cli-outputter";
 import { iCliUserInputRequestor } from "./cli-user-input-requestor";
 import { RecursivePartial } from "./recursive-partial";
@@ -19,7 +20,7 @@ export interface iCliApplicationOptions {
 export interface iCliApplication {
     startApp(
         options: RecursivePartial<iCliApplicationOptions>,
-        cliCommands: iCliCommand[],
+        cliCommandsCollection: iCliCommandsCollection,
         argV: string[],
         cliOutputter?: iCliOutputter,
         cliUserInputRequestor?: iCliUserInputRequestor,

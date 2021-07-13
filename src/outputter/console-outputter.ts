@@ -2,7 +2,6 @@ import { iCliCommand } from "../models/cli-command";
 import { iCliOutputter } from "../models/cli-outputter";
 
 export class ConsoleOutputter implements iCliOutputter {
-
     private cf = {
         _: "\x1b[0m",
         y: "\x1b[33m",
@@ -10,7 +9,14 @@ export class ConsoleOutputter implements iCliOutputter {
         cy: "\x1b[36m",
     };
 
+    constructor(
+        private maxDebugLevel: number = Infinity
+    ) {}
+
     pushDebug(level: number, ...params: any[]): void {
+        if (level > this.maxDebugLevel) {
+            return;
+        }
         this.log("log", ...params.map(this.mapParam.bind(this, this.cf.cy)));
     }
 
@@ -24,6 +30,11 @@ export class ConsoleOutputter implements iCliOutputter {
 
     pushError(...params: any[]): void {
         this.log("error", ...params.map(this.mapParam.bind(this, this.cf.r)));
+    }
+
+    clearVisibleOutput(): void {
+        process.stdout.write("\u001b[2J\u001b[0;0H");
+        console.clear();
     }
 
     pushCommandsDescriptionsOutput(cliCommands: iCliCommand[]): void {
@@ -44,20 +55,20 @@ export class ConsoleOutputter implements iCliOutputter {
 
         this.pushMessage(
             "Name:".padEnd(longestNameLen) +
-            " | " +
-            "Tokens:".padEnd(longestTokenLen) +
-            " | " +
-            "Description:".padEnd(longestDescLen)
+                " | " +
+                "Tokens:".padEnd(longestTokenLen) +
+                " | " +
+                "Description:".padEnd(longestDescLen)
         );
 
         for (let i = 0; i < cliCommands.length; i++) {
             const cmd = cliCommands[i];
             this.pushMessage(
                 cmd.name.padEnd(longestNameLen) +
-                " | " +
-                cmd.tokens.join(", ").padEnd(longestTokenLen) +
-                " | " +
-                cmd.displayText.padEnd(longestDescLen)
+                    " | " +
+                    cmd.tokens.join(", ").padEnd(longestTokenLen) +
+                    " | " +
+                    cmd.displayText.padEnd(longestDescLen)
             );
         }
     }

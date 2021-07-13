@@ -18,6 +18,24 @@ export class ConsoleUserInputRequestor extends BaseUserInputRequestor {
         }
     }
 
+    protected async getBoolean(
+        displayText: string,
+        defaultValue?: boolean
+    ): Promise<boolean> {
+        const option = await this.awaitSelectOption(
+            displayText,
+            [{
+                name: 'yes',
+                displayText: 'Yes'
+            }, {
+                name: 'yes',
+                displayText: 'No'
+            }],
+            typeof defaultValue === 'undefined' ? 'yes' : defaultValue ? 'yes' : 'no'
+        );
+        return option === 'yes';
+    }
+
     private async awaitString(
         message: string,
         initialValue: string = ""

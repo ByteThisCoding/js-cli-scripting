@@ -6,10 +6,7 @@ import { iCliOutputter } from "../models/cli-outputter";
 import { iCliUserInputRequestor } from "../models/cli-user-input-requestor";
 
 export abstract class BaseUserInputRequestor implements iCliUserInputRequestor {
-
-    constructor(
-        private cliOutputter: iCliOutputter
-    ) {}
+    constructor(private cliOutputter: iCliOutputter) {}
 
     async awaitInput(param: iCliCommandParam): Promise<any> {
         if (param.doRepeat) {
@@ -29,20 +26,36 @@ export abstract class BaseUserInputRequestor implements iCliUserInputRequestor {
         }
     }
 
-    private async awaitSingleInput(param: iCliCommandParam, numAttempts = 0): Promise<any> {
-        const input = await this.getInput(
-            param.displayText,
-            param.defaultValue,
-            param.choices
-        );
-        if (input) {
-            return this.parseValidateInput(param, input, numAttempts);
+    private async awaitSingleInput(
+        param: iCliCommandParam,
+        numAttempts = 0
+    ): Promise<any> {
+        let input: string | boolean;
+        if (param.type && param.type === 'boolean') {
+            input = await this.getBoolean(
+                param.displayText,
+                this.parseBoolean(param.defaultValue || false)
+            );
+            return input;
         } else {
-            return void 0;
+            input = await this.getInput(
+                param.displayText,
+                param.defaultValue,
+                param.choices
+            );
+            if (input) {
+                return this.parseValidateInput(param, input, numAttempts);
+            } else {
+                return void 0;
+            }
         }
     }
 
-    private parseValidateInput(param: iCliCommandParam, input: string, numAttempts:  number): any {
+    private parseValidateInput(
+        param: iCliCommandParam,
+        input: string,
+        numAttempts: number
+    ): any {
         let parsed;
         switch (param.type || "string") {
             case "number":
@@ -60,11 +73,15 @@ export abstract class BaseUserInputRequestor implements iCliUserInputRequestor {
             if (validation.isValid) {
                 return parsed;
             } else {
-                const message = validation.message || `Input is invalid, please try again.`;
+                const message =
+                    validation.message || `Input is invalid, please try again.`;
                 this.cliOutputter.pushWarning(message);
-                if (typeof validation.tryAgain === 'undefined' || !validation.tryAgain) {
-                    throw new Error(`Input failed`)
-                };
+                if (
+                    typeof validation.tryAgain === "undefined" ||
+                    !validation.tryAgain
+                ) {
+                    throw new Error(`Input failed`);
+                }
                 return this.awaitSingleInput(param, numAttempts + 1);
             }
         } else {
@@ -78,6 +95,11 @@ export abstract class BaseUserInputRequestor implements iCliUserInputRequestor {
         choices?: iCliCommandParamChoice[]
     ): Promise<string>;
 
+    protected abstract getBoolean(
+        displayText: string,
+        defaultValue?: boolean
+    ): Promise<boolean>;
+
     private parseNumber(input: string): number {
         const result = parseFloat(input);
         if (isNaN(result)) {
@@ -88,7 +110,11 @@ export abstract class BaseUserInputRequestor implements iCliUserInputRequestor {
         return result;
     }
 
-    private parseBoolean(input: string): boolean {
+    private parseBoolean(input: string | boolean): boolean {
+        if (typeof input === 'boolean') {
+            return input;
+        }
+
         switch (input.toLowerCase().trim()) {
             case "y":
             case "yes":

@@ -10,4 +10,6 @@ export interface iCliOutputter {
     pushError(...params: any[]): void;
 
     pushCommandsDescriptionsOutput(commands: iCliCommand[]): void;
+
+    clearVisibleOutput(): void;
 }

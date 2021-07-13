@@ -10,11 +10,11 @@ export class CliCommandExecutor implements iCliCommandExecutor {
 
     async execute(cliCmd: iCliCommand): Promise<void> {
         const paramsInput: any = {};
-        const params = cliCmd.requiredParams || [];
+        const params = (await cliCmd.getRequiredParams()) || [];
         for (let i = 0; i < params.length; i++) {
             const param = params[i];
             const input = await this.cliUserInputRequestor.awaitInput(param);
-            if (input[param.name]) {
+            if (paramsInput[param.name]) {
                 throw new Error(
                     `CliCommandExecutor: multiple input params have the same name.`
                 );

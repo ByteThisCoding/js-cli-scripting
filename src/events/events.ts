@@ -1,4 +1,4 @@
 export const EVENTS = {
     quitApp: "quitApp",
-    cmdDefinitionReceived: "cmdDefinitionReceived"
-}
+    cmdDefinitionReceived: "cmdDefinitionReceived",
+};

@@ -1,8 +1,9 @@
 {
     "name": "@byte-this/js-cli",
-    "version": "1.0.1",
+    "version": "1.0.9",
     "description": "Functionality to streamline the process of scripting for the console with javascript",
-    "main": "index.js",
+    "main": "public-api.js",
+    "types": "public-api.d.ts",
     "scripts": {
         "test": "jest --passWithNoTests",
         "test:coverage": "jest --passWithNoTests --coverage && jest-coverage-badges",
