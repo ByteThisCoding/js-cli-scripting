@@ -1,0 +1,36 @@
+{
+    "name": "@byte-this/js-cli",
+    "version": "1.0.1",
+    "description": "Functionality to streamline the process of scripting for the console with javascript",
+    "main": "index.js",
+    "scripts": {
+        "test": "jest --passWithNoTests",
+        "test:coverage": "jest --passWithNoTests --coverage && jest-coverage-badges",
+        "format": "npx prettier --write .",
+        "build": "node build-cli.js build",
+        "publish:npm": "node build-cli.js publish"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/ByteThisStore/js-cli-scripting.git"
+    },
+    "author": "Byte This!",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/ByteThisStore/js-cli-scripting/issues"
+    },
+    "homepage": "https://github.com/ByteThisStore/js-cli-scripting#readme",
+    "dependencies": {
+        "enquirer": "^2.3.6"
+    },
+    "devDependencies": {
+        "@types/jest": "^26.0.23",
+        "cpy-cli": "^3.1.1",
+        "jest": "^26.6.3",
+        "jest-coverage-badges": "^1.1.2",
+        "prettier": "^2.3.0",
+        "ts-jest": "^26.5.6",
+        "ts-node": "^9.1.1",
+        "typescript": "^4.2.4"
+    }
+}
