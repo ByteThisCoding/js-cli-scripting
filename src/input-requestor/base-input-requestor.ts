@@ -2,22 +2,73 @@ import {
     iCliCommandParam,
     iCliCommandParamChoice,
 } from "../models/cli-command-param";
+import { iCliOutputter } from "../models/cli-outputter";
 import { iCliUserInputRequestor } from "../models/cli-user-input-requestor";
 
 export abstract class BaseUserInputRequestor implements iCliUserInputRequestor {
+
+    constructor(
+        private cliOutputter: iCliOutputter
+    ) {}
+
     async awaitInput(param: iCliCommandParam): Promise<any> {
+        if (param.doRepeat) {
+            const results: any = [];
+            let isQuerying = true;
+            do {
+                const thisResult = await this.awaitSingleInput(param);
+                if (thisResult) {
+                    results.push(thisResult);
+                } else {
+                    isQuerying = false;
+                }
+            } while (isQuerying && param.doRepeat(results));
+            return results;
+        } else {
+            return this.awaitSingleInput(param);
+        }
+    }
+
+    private async awaitSingleInput(param: iCliCommandParam, numAttempts = 0): Promise<any> {
         const input = await this.getInput(
             param.displayText,
             param.defaultValue,
             param.choices
         );
+        if (input) {
+            return this.parseValidateInput(param, input, numAttempts);
+        } else {
+            return void 0;
+        }
+    }
+
+    private parseValidateInput(param: iCliCommandParam, input: string, numAttempts:  number): any {
+        let parsed;
         switch (param.type || "string") {
             case "number":
-                return this.parseNumber(input);
+                parsed = this.parseNumber(input);
+                break;
             case "boolean":
-                return this.parseBoolean(input);
+                parsed = this.parseBoolean(input);
+                break;
             default:
-                return input.trim();
+                parsed = input.trim();
+                break;
+        }
+        if (param.isValid) {
+            const validation = param.isValid(parsed, numAttempts);
+            if (validation.isValid) {
+                return parsed;
+            } else {
+                const message = validation.message || `Input is invalid, please try again.`;
+                this.cliOutputter.pushWarning(message);
+                if (typeof validation.tryAgain === 'undefined' || !validation.tryAgain) {
+                    throw new Error(`Input failed`)
+                };
+                return this.awaitSingleInput(param, numAttempts + 1);
+            }
+        } else {
+            return parsed;
         }
     }
 

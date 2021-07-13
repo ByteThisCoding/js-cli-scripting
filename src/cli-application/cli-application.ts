@@ -48,7 +48,9 @@ export class CliApplication implements iCliApplication {
             cliOutputter = new ConsoleOutputter();
         }
         if (!cliUserInputRequestor) {
-            cliUserInputRequestor = new ConsoleUserInputRequestor();
+            cliUserInputRequestor = new ConsoleUserInputRequestor(
+                cliOutputter
+            );
         }
         if (!cmdExecutor) {
             cmdExecutor = new CliCommandExecutor(

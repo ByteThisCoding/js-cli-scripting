@@ -9,4 +9,10 @@ export interface iCliCommandParam {
     type?: "string" | "number" | "boolean";
     choices?: iCliCommandParamChoice[];
     defaultValue?: string;
+    doRepeat?: (valuesSoFar: any[]) => boolean;
+    isValid?: (value: any, numAttempts: number) => {
+        isValid: boolean;
+        message?: string;
+        tryAgain?: boolean;
+    };
 }

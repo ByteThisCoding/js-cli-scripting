@@ -1,0 +1,42 @@
+import { iCliCommand } from "../../models/cli-command";
+import { iCliCommandExecutor } from "../../models/cli-command-executor";
+import { iCliCommandParam } from "../../models/cli-command-param";
+import { iCliOutputter } from "../../models/cli-outputter";
+import EventEmitter from "events";
+import { EVENTS } from "../../events/events";
+
+/**
+ * This is an internal command to be used by the application to execute other commands
+ */
+export class CommandRequestorCommand implements iCliCommand {
+    name: string = "_request_cmd";
+
+    displayText: string = "";
+    
+    tokens: string[] = [];
+    
+    requiredParams?: iCliCommandParam[] | undefined = [{
+        name: "cmdNameToken",
+        displayText: "Enter the next command to execute"
+    }];
+
+    constructor(
+        private commands: iCliCommand[],
+        private cmdExecutor: iCliCommandExecutor,
+        private eventEmitter: EventEmitter
+    ) {}
+    
+    async execute(userParamsInput: { [key: string]: any; }, cliOutputter: iCliOutputter): Promise<void> {
+        const cmdNameToken = userParamsInput.cmdNameToken.toLowerCase();
+        const cmd = this.commands.find(cmd => {
+            return cmd.name === cmdNameToken || !!cmd.tokens.find(tkn => tkn === cmdNameToken)
+        });
+        if (!cmd) {
+            cliOutputter.pushError(`There is no command with the name or token ${cmdNameToken}`);
+            return;
+        }
+
+        this.eventEmitter.emit(EVENTS.cmdDefinitionReceived, cmd);
+    }
+    
+}
