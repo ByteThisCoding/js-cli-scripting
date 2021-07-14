@@ -1,18 +1,14 @@
 import EventEmitter from "events";
-import { argv } from "process";
 import { CliCommandExecutor } from "../cmd-executor/cmd-executor";
 import { EVENTS } from "../events/events";
-import { ConsoleUserInputRequestor } from "../input-requestor/console-input-requestor";
 import {
     iCliApplication,
     iCliApplicationOptions,
 } from "../models/cli-application";
 import { iCliCommand } from "../models/cli-command";
-import { iCliCommandExecutor } from "../models/cli-command-executor";
 import { iCliOutputter } from "../models/cli-outputter";
 import { iCliUserInputRequestor } from "../models/cli-user-input-requestor";
 import { RecursivePartial } from "../models/recursive-partial";
-import { ConsoleOutputter } from "../outputter/console-outputter";
 import { QuitCliCommand } from "./app-commands/quit-cmd";
 import { ArgvCommandExecutorCommand } from "./internal-app-commands/argv-exec-cmd";
 import { CommandExecutorCommand } from "./internal-app-commands/cmd-exec-cmd";
@@ -24,10 +20,9 @@ export class CliApplication implements iCliApplication {
     async startApp(
         inputOptions: RecursivePartial<iCliApplicationOptions>,
         cliCommandsCollection: iCliCommandsCollection,
-        argV?: string[],
-        cliOutputter?: iCliOutputter,
-        cliUserInputRequestor?: iCliUserInputRequestor,
-        cmdExecutor?: iCliCommandExecutor
+        argV: string[],
+        cliOutputter: iCliOutputter,
+        cliUserInputRequestor: iCliUserInputRequestor,
     ): Promise<void> {
         const options: iCliApplicationOptions = {
             appendDefaultCommands: true,
@@ -46,18 +41,6 @@ export class CliApplication implements iCliApplication {
 
         //instantiate defaults if necessary
         const eventEmitter = new EventEmitter();
-        if (!cliOutputter) {
-            cliOutputter = new ConsoleOutputter();
-        }
-        if (!cliUserInputRequestor) {
-            cliUserInputRequestor = new ConsoleUserInputRequestor(cliOutputter);
-        }
-        if (!cmdExecutor) {
-            cmdExecutor = new CliCommandExecutor(
-                cliOutputter,
-                cliUserInputRequestor
-            );
-        }
 
         //listen to events
         this.listenToEvents(eventEmitter);

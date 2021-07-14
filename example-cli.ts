@@ -4,8 +4,10 @@
 
 import { CliApplication } from "./src/cli-application/cli-application";
 import { ArrayCliCommandsCollection } from "./src/cli-commands-collection/cli-commands-collection";
+import { ConsoleUserInputRequestor } from "./src/input-requestor/console-input-requestor";
 import { iCliCommand } from "./src/models/cli-command";
 import { iCliOutputter } from "./src/models/cli-outputter";
+import { ConsoleOutputter } from "./src/outputter/console-outputter";
 
 const commands: iCliCommand[] = [
     {
@@ -121,5 +123,9 @@ new CliApplication().startApp(
         },
     },
     new ArrayCliCommandsCollection(commands),
-    [...process.argv].slice(2)
+    [...process.argv].slice(2),
+    new ConsoleOutputter(),
+    new ConsoleUserInputRequestor(
+        new ConsoleOutputter()
+    )
 );

@@ -6,7 +6,7 @@ import { iCliOutputter } from "../models/cli-outputter";
 import { iCliUserInputRequestor } from "../models/cli-user-input-requestor";
 
 export abstract class BaseUserInputRequestor implements iCliUserInputRequestor {
-    constructor(private cliOutputter: iCliOutputter) {}
+    constructor(protected cliOutputter: iCliOutputter) {}
 
     async awaitInput(param: iCliCommandParam): Promise<any> {
         if (param.doRepeat) {

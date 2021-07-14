@@ -3,7 +3,9 @@ import {
     iCliCommandParamChoice,
 } from "../models/cli-command-param";
 import { BaseUserInputRequestor } from "./base-input-requestor";
-const { prompt } = require("enquirer");
+const tryRequire = require('try-require');
+const enquirer = tryRequire("enquirer");
+const prompt = enquirer ? enquirer.promt : null;
 
 export class ConsoleUserInputRequestor extends BaseUserInputRequestor {
     protected getInput(

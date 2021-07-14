@@ -22,8 +22,7 @@ export interface iCliApplication {
         options: RecursivePartial<iCliApplicationOptions>,
         cliCommandsCollection: iCliCommandsCollection,
         argV: string[],
-        cliOutputter?: iCliOutputter,
-        cliUserInputRequestor?: iCliUserInputRequestor,
-        cmdExecutor?: iCliCommandExecutor
+        cliOutputter: iCliOutputter,
+        cliUserInputRequestor: iCliUserInputRequestor
     ): Promise<void>;
 }

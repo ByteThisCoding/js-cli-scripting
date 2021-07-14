@@ -1,6 +1,6 @@
 {
     "name": "@byte-this/js-cli",
-    "version": "1.0.9",
+    "version": "1.0.17",
     "description": "Functionality to streamline the process of scripting for the console with javascript",
     "main": "public-api.js",
     "types": "public-api.d.ts",
@@ -22,6 +22,9 @@
     },
     "homepage": "https://github.com/ByteThisStore/js-cli-scripting#readme",
     "dependencies": {
+        "try-require": "^1.2.1"
+    },
+    "peerDependencies": {
         "enquirer": "^2.3.6"
     },
     "devDependencies": {
