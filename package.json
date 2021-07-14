@@ -1,6 +1,6 @@
 {
     "name": "@byte-this/js-cli",
-    "version": "1.0.17",
+    "version": "1.0.21",
     "description": "Functionality to streamline the process of scripting for the console with javascript",
     "main": "public-api.js",
     "types": "public-api.d.ts",
@@ -28,6 +28,7 @@
         "enquirer": "^2.3.6"
     },
     "devDependencies": {
+        "enquirer": "^2.3.6",
         "@types/jest": "^26.0.23",
         "cpy-cli": "^3.1.1",
         "jest": "^26.6.3",

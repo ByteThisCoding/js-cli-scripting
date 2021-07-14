@@ -3,12 +3,14 @@ import { iCliCommandExecutor } from "../../models/cli-command-executor";
 import { iCliCommandParam } from "../../models/cli-command-param";
 import { iCliOutputter } from "../../models/cli-outputter";
 import { iCliUserInputRequestor } from "../../models/cli-user-input-requestor";
+import * as EventEmitter from "events";
+import { EVENTS } from "../../events/events";
 
 /**
  * This is an internal command to be used by the application to execute other commands
  */
 export class MultiCommandExecutorCommand implements iCliCommand {
-    name: string = "multi-cmd";
+    name: string = "Multi-Cmd";
 
     displayText: string = "Execute multiple commands in sequence";
 
@@ -16,7 +18,8 @@ export class MultiCommandExecutorCommand implements iCliCommand {
 
     constructor(
         private commands: iCliCommand[],
-        private cliUserInputRequestor: iCliUserInputRequestor
+        private cliUserInputRequestor: iCliUserInputRequestor,
+        private eventEmitter: EventEmitter
     ) {}
 
     async getRequiredParams(): Promise<iCliCommandParam[] | null> {
@@ -47,6 +50,7 @@ export class MultiCommandExecutorCommand implements iCliCommand {
         for (let i = 0; i < cmdNameParams.length; i++) {
             const cmdNameParam = cmdNameParams[i];
             await cmdNameParam.cmd.execute(cmdNameParam.params, cliOutputter);
+            this.eventEmitter.emit(EVENTS.cmdExecuted, cmdNameParam.cmd);
         }
     }
 

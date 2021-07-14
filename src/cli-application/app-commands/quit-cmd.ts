@@ -9,7 +9,7 @@ import { iCliOutputter } from "../../models/cli-outputter";
  * This is an internal command to be used by the application to execute other commands
  */
 export class QuitCliCommand implements iCliCommand {
-    name: string = "quit";
+    name: string = "Quit";
 
     displayText: string = "Quit the application.";
 

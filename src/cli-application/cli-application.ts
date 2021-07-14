@@ -17,6 +17,19 @@ import { iCliCommandsCollection } from "../models/cli-commands-collection";
 import { ClearScreenCmd } from "./app-commands/clear-screen-cmd";
 
 export class CliApplication implements iCliApplication {
+
+    private quitListeners: (() => any)[] = [];
+
+    private commandListeners: ((cmd: iCliCommand) => any)[] = [];
+
+    onQuit(callback: () => any): void {
+        this.quitListeners.push(callback);
+    }
+
+    onCommand(callback: (cmd: iCliCommand) => any): void {
+        this.commandListeners.push(callback);
+    }
+   
     async startApp(
         inputOptions: RecursivePartial<iCliApplicationOptions>,
         cliCommandsCollection: iCliCommandsCollection,
@@ -106,6 +119,7 @@ export class CliApplication implements iCliApplication {
         while (true) {
             await cliCommandExecutor.execute(commandExecutorCommand);
             if (options.loop.outputCommandsTexts) {
+                cliOutputter.pushMessage("");
                 cliOutputter.pushCommandsDescriptionsOutput(cliCommands);
             }
             const updates = await this.getCommands(
@@ -129,13 +143,21 @@ export class CliApplication implements iCliApplication {
             cliOutputter.pushMessage(options.startup.initialOutput);
         }
         if (options.startup.outputCommandsTexts) {
+            cliOutputter.pushMessage("");
             cliOutputter.pushCommandsDescriptionsOutput(cliCommands);
         }
     }
 
     private listenToEvents(eventEmitter: EventEmitter): void {
+
         eventEmitter.on(EVENTS.quitApp, () => {
-            process.exit(0);
+            this.quitListeners.forEach(callback => callback());
+            this.quitListeners = [];
+            this.commandListeners = [];
+        });
+
+        eventEmitter.on(EVENTS.cmdExecuted, (cmd: iCliCommand) => {
+            this.commandListeners.forEach(callback => callback(cmd));
         });
     }
 
@@ -164,7 +186,8 @@ export class CliApplication implements iCliApplication {
                 new QuitCliCommand(eventEmitter),
                 new MultiCommandExecutorCommand(
                     cliCommands,
-                    cliUserInputRequestor
+                    cliUserInputRequestor,
+                    eventEmitter
                 )
             );
         }
@@ -174,7 +197,8 @@ export class CliApplication implements iCliApplication {
             new CliCommandExecutor(
                 cliOutputter,
                 cliUserInputRequestor
-            )
+            ),
+            eventEmitter
         );
 
         return {

@@ -35,15 +35,26 @@ const TestCommand: iCliCommand = {
 
 With this kind of definition, the program will request everything under **requiredParams** from the user, then execute the command and pass in those required commands.
 
-Then, we setup our application runner
+Then, we setup our application runner:
 
 ```typescript
-new CliApplication().startApp(
+const app = new CliApplication()
+
+app.onQuit(() => {
+    process.exit(0);
+});
+
+app.startApp(
     {
         startup: {
             initialOutput: "Welcome to the example application",
         },
     },
-    commands
+    new ArrayCliCommandsCollection(commands),
+    [...process.argv].slice(2),
+    new ConsoleOutputter(),
+    new ConsoleUserInputRequestor(
+        new ConsoleOutputter()
+    )
 );
 ```

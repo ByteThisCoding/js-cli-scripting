@@ -5,7 +5,7 @@ import {
 import { BaseUserInputRequestor } from "./base-input-requestor";
 const tryRequire = require('try-require');
 const enquirer = tryRequire("enquirer");
-const prompt = enquirer ? enquirer.promt : null;
+const prompt = enquirer ? enquirer.prompt : null;
 
 export class ConsoleUserInputRequestor extends BaseUserInputRequestor {
     protected getInput(

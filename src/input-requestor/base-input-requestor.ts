@@ -26,7 +26,7 @@ export abstract class BaseUserInputRequestor implements iCliUserInputRequestor {
         }
     }
 
-    private async awaitSingleInput(
+    protected async awaitSingleInput(
         param: iCliCommandParam,
         numAttempts = 0
     ): Promise<any> {
@@ -51,7 +51,7 @@ export abstract class BaseUserInputRequestor implements iCliUserInputRequestor {
         }
     }
 
-    private parseValidateInput(
+    protected parseValidateInput(
         param: iCliCommandParam,
         input: string,
         numAttempts: number

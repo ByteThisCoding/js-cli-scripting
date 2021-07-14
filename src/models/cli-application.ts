@@ -25,4 +25,8 @@ export interface iCliApplication {
         cliOutputter: iCliOutputter,
         cliUserInputRequestor: iCliUserInputRequestor
     ): Promise<void>;
+
+    onQuit(callback: () => any): void;
+
+    onCommand(callback: (cmd: iCliCommand) => any): void;
 }

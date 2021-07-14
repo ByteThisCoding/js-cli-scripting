@@ -2,6 +2,8 @@ import { iCliCommand } from "../../models/cli-command";
 import { iCliCommandExecutor } from "../../models/cli-command-executor";
 import { iCliCommandParam } from "../../models/cli-command-param";
 import { iCliOutputter } from "../../models/cli-outputter";
+import * as EventEmitter from "events";
+import { EVENTS } from "../../events/events";
 
 /**
  * This is an internal command to be used by the application to execute other commands
@@ -24,7 +26,8 @@ export class CommandExecutorCommand implements iCliCommand {
 
     constructor(
         private commands: iCliCommand[],
-        private cmdExecutor: iCliCommandExecutor
+        private cmdExecutor: iCliCommandExecutor,
+        private eventEmitter: EventEmitter
     ) {}
 
     async execute(
@@ -46,5 +49,6 @@ export class CommandExecutorCommand implements iCliCommand {
         }
 
         await this.cmdExecutor.execute(cmd!);
+        this.eventEmitter.emit(EVENTS.cmdExecuted, cmd!);
     }
 }

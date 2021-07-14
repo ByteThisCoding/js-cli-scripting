@@ -11,7 +11,7 @@ import { ConsoleOutputter } from "./src/outputter/console-outputter";
 
 const commands: iCliCommand[] = [
     {
-        name: "date",
+        name: "Print Date",
         displayText: "Print the current date",
         tokens: ["print-date", "p-d"],
         async getRequiredParams() {
@@ -25,7 +25,7 @@ const commands: iCliCommand[] = [
         },
     },
     {
-        name: "print",
+        name: "Print",
         displayText: "Print some text from the user input",
         tokens: ["print", "p"],
         async getRequiredParams() {
@@ -44,7 +44,7 @@ const commands: iCliCommand[] = [
         },
     },
     {
-        name: "print-sentence",
+        name: "Print Sentence",
         displayText: "Print an entire sentence based on the user input",
         tokens: ["print-sentence", "p-s"],
         async getRequiredParams() {
@@ -74,7 +74,7 @@ const commands: iCliCommand[] = [
         },
     },
     {
-        name: "boolean-test",
+        name: "Boolean Test",
         displayText: "Ask for a boolean yes/no",
         tokens: ["b-t"],
         async getRequiredParams() {
@@ -92,7 +92,7 @@ const commands: iCliCommand[] = [
         }
     },
     {
-        name: "add-numbers",
+        name: "Add Numbers",
         displayText: "Add some numbers together",
         tokens: ["add-numbers", "a-n"],
         async getRequiredParams() {
@@ -116,7 +116,13 @@ const commands: iCliCommand[] = [
     },
 ];
 
-new CliApplication().startApp(
+const app = new CliApplication()
+
+app.onQuit(() => {
+    process.exit(0);
+});
+
+app.startApp(
     {
         startup: {
             initialOutput: "Welcome to the example application",
