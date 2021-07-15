@@ -6,7 +6,7 @@ import { iCliOutputter } from "../models/cli-outputter";
 import { iCliUserInputRequestor } from "../models/cli-user-input-requestor";
 
 export abstract class BaseUserInputRequestor implements iCliUserInputRequestor {
-    constructor(protected cliOutputter: iCliOutputter) {}
+    constructor(protected cliOutputter: iCliOutputter) { }
 
     async awaitInput(param: iCliCommandParam): Promise<any> {
         if (param.doRepeat) {
@@ -57,35 +57,54 @@ export abstract class BaseUserInputRequestor implements iCliUserInputRequestor {
         numAttempts: number
     ): any {
         let parsed;
-        switch (param.type || "string") {
-            case "number":
-                parsed = this.parseNumber(input);
-                break;
-            case "boolean":
-                parsed = this.parseBoolean(input);
-                break;
-            default:
-                parsed = input.trim();
-                break;
-        }
-        if (param.isValid) {
-            const validation = param.isValid(parsed, numAttempts);
-            if (validation.isValid) {
-                return parsed;
+
+        const isValidDecorator = (err: any, callback?: (parsed: any, numAttempts: number) => { isValid: boolean; message?: string; tryAgain?: boolean; }): ((parsed: any, numAttempts: number) => { isValid: boolean; message?: string; tryAgain?: boolean; }) => {
+            if (err) {
+                return (parsed: any, numAttempts: number) => ({
+                    isValid: false,
+                    message: 'Error processing user input: ' + err.toString(),
+                    tryAgain: true
+                });
+            } else if (callback) {
+                return callback;
             } else {
-                const message =
-                    validation.message || `Input is invalid, please try again.`;
-                this.cliOutputter.pushWarning(message);
-                if (
-                    typeof validation.tryAgain === "undefined" ||
-                    !validation.tryAgain
-                ) {
-                    throw new Error(`Input failed`);
-                }
-                return this.awaitSingleInput(param, numAttempts + 1);
+                return (parsed: any, numAttempts: number) => ({
+                    isValid: true
+                });
             }
-        } else {
+        }
+
+        let error = null;
+        try {
+            switch (param.type || "string") {
+                case "number":
+                    parsed = this.parseNumber(input);
+                    break;
+                case "boolean":
+                    parsed = this.parseBoolean(input);
+                    break;
+                default:
+                    parsed = input.trim();
+                    break;
+            }
+        } catch (err) {
+            error = err;
+        }
+        const decorated = isValidDecorator(error, param.isValid);
+        const validation = decorated(parsed, numAttempts);
+        if (validation.isValid) {
             return parsed;
+        } else {
+            const message =
+                validation.message || `Input is invalid, please try again.`;
+            this.cliOutputter.pushWarning(message);
+            if (
+                typeof validation.tryAgain === "undefined" ||
+                !validation.tryAgain
+            ) {
+                throw new Error(`Input failed`);
+            }
+            return this.awaitSingleInput(param, numAttempts + 1);
         }
     }
 
