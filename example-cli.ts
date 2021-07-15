@@ -92,6 +92,33 @@ const commands: iCliCommand[] = [
         }
     },
     {
+        name: "Choose Something",
+        displayText: "Choose from a list of options",
+        tokens: ["ch-s"],
+        async getRequiredParams() {
+            return [{
+                name: "choice",
+                displayText: "Make a choice",
+                choices: [{
+                    name: "one",
+                    displayText: "First choice"
+                }, {
+                    name: "two",
+                    displayText: "Second choice"
+                }, {
+                    name: "three",
+                    displayText: "Third choice"
+                }, {
+                    name: "four",
+                    displayText: "Fourth choice"
+                }],
+            }];
+        },
+        execute: async (params: {choice: string;}, cliOutputter: iCliOutputter) => {
+            cliOutputter.pushMessage("Choice result:", params.choice);
+        }
+    },
+    {
         name: "Add Numbers",
         displayText: "Add some numbers together",
         tokens: ["add-numbers", "a-n"],
