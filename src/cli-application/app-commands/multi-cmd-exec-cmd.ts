@@ -37,7 +37,7 @@ export class MultiCommandExecutorCommand implements iCliCommand {
             params: { [key: string]: any };
         }[] = [];
         while (isGettingInput) {
-            const cmd = await this.getCmd();
+            const cmd = await this.getCmd(cliOutputter);
             if (!cmd) {
                 isGettingInput = false;
             } else {
@@ -54,8 +54,8 @@ export class MultiCommandExecutorCommand implements iCliCommand {
         }
     }
 
-    private async getCmd(): Promise<iCliCommand> {
-        let cmd: iCliCommand;
+    private async getCmd(cliOutputter: iCliOutputter): Promise<iCliCommand | undefined> {
+        let cmd: iCliCommand | undefined;
         //set the value within the closure
         await this.cliUserInputRequestor.awaitInput({
             name: "cmdToken",
@@ -74,13 +74,14 @@ export class MultiCommandExecutorCommand implements iCliCommand {
                     return {
                         isValid: false,
                         message: `There is no command with the name or token ${cmdNameToken}`,
+                        tryAgain: true
                     };
                 } else {
                     return { isValid: true };
                 }
             },
         });
-        return cmd!;
+        return cmd;
     }
 
     private async getParamsForCmd(
@@ -91,7 +92,7 @@ export class MultiCommandExecutorCommand implements iCliCommand {
         for (let i = 0; i < params.length; i++) {
             const param = params[i];
             const input = await this.cliUserInputRequestor.awaitInput(param);
-            if (input[param.name]) {
+            if (paramsInput[param.name]) {
                 throw new Error(
                     `CliCommandExecutor: multiple input params have the same name.`
                 );

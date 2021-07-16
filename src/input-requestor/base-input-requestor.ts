@@ -66,7 +66,17 @@ export abstract class BaseUserInputRequestor implements iCliUserInputRequestor {
                     tryAgain: true
                 });
             } else if (callback) {
-                return callback;
+                return (parsed: any, numAttempts: number) => {
+                    try {
+                        return callback(parsed, numAttempts);
+                    } catch (err) {
+                        return {
+                            isValid: false,
+                            message: err.toString(),
+                            tryAgain: true
+                        };
+                    }
+                }
             } else {
                 return (parsed: any, numAttempts: number) => ({
                     isValid: true
