@@ -6,6 +6,7 @@ export * from "./src/models/cli-command-executor";
 export * from "./src/models/cli-user-input-requestor";
 export * from "./src/models/recursive-partial";
 export * from "./src/models/cli-commands-collection";
+export * from "./src/models/cli-application-options";
 
 export * from "./src/outputter/console-outputter";
 export * from "./src/outputter/composite-outputter";

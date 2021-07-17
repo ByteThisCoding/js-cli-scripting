@@ -3,7 +3,7 @@ import {
     iCliCommandParamChoice,
 } from "../models/cli-command-param";
 import { BaseUserInputRequestor } from "./base-input-requestor";
-const tryRequire = require('try-require');
+const tryRequire = require("try-require");
 const enquirer = tryRequire("enquirer");
 const prompt = enquirer ? enquirer.prompt : null;
 
@@ -26,16 +26,23 @@ export class ConsoleUserInputRequestor extends BaseUserInputRequestor {
     ): Promise<boolean> {
         const option = await this.awaitSelectOption(
             displayText,
-            [{
-                name: 'yes',
-                displayText: 'Yes'
-            }, {
-                name: 'yes',
-                displayText: 'No'
-            }],
-            typeof defaultValue === 'undefined' ? 'yes' : defaultValue ? 'yes' : 'no'
+            [
+                {
+                    name: "yes",
+                    displayText: "Yes",
+                },
+                {
+                    name: "yes",
+                    displayText: "No",
+                },
+            ],
+            typeof defaultValue === "undefined"
+                ? "yes"
+                : defaultValue
+                ? "yes"
+                : "no"
         );
-        return option === 'yes';
+        return option === "yes";
     }
 
     private async awaitString(

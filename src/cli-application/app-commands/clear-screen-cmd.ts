@@ -10,8 +10,10 @@ export class ClearScreenCmd implements iCliCommand {
     async getRequiredParams(): Promise<iCliCommandParam[] | null> {
         return null;
     }
-    async execute(userParamsInput: { [key: string]: any; }, cliOutputter: iCliOutputter): Promise<void> {
+    async execute(
+        userParamsInput: { [key: string]: any },
+        cliOutputter: iCliOutputter
+    ): Promise<void> {
         cliOutputter.clearVisibleOutput();
     }
-    
 }

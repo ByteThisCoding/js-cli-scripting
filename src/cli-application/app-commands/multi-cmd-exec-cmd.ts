@@ -41,8 +41,16 @@ export class MultiCommandExecutorCommand implements iCliCommand {
             if (!cmd) {
                 isGettingInput = false;
             } else {
-                const params = await this.getParamsForCmd(cmd);
-                cmdNameParams.push({ cmd, params });
+                try {
+                    const params = await this.getParamsForCmd(cmd);
+                    cmdNameParams.push({ cmd, params });
+                } catch (err) {
+                    cliOutputter.pushError(`Error:`, err.toString());
+                    cliOutputter.pushWarning(
+                        `Could not get command params, so skipping`
+                    );
+                    isGettingInput = false;
+                }
             }
         }
 
@@ -54,33 +62,43 @@ export class MultiCommandExecutorCommand implements iCliCommand {
         }
     }
 
-    private async getCmd(cliOutputter: iCliOutputter): Promise<iCliCommand | undefined> {
+    private async getCmd(
+        cliOutputter: iCliOutputter
+    ): Promise<iCliCommand | undefined> {
         let cmd: iCliCommand | undefined;
         //set the value within the closure
-        await this.cliUserInputRequestor.awaitInput({
-            name: "cmdToken",
-            displayText: "Multi-Cmd: Enter the next command to execute",
-            isValid: (cmdNameToken: string) => {
-                if (!cmdNameToken) {
-                    return { isValid: true };
-                }
-                cmd = this.commands.find((cmd) => {
-                    return (
-                        cmd.name === cmdNameToken ||
-                        !!cmd.tokens.find((tkn) => tkn === cmdNameToken)
-                    );
-                })!;
-                if (!cmd) {
-                    return {
-                        isValid: false,
-                        message: `There is no command with the name or token ${cmdNameToken}`,
-                        tryAgain: true
-                    };
-                } else {
-                    return { isValid: true };
-                }
-            },
-        });
+        await this.cliUserInputRequestor
+            .awaitInput({
+                name: "cmdToken",
+                displayText: "Multi-Cmd: Enter the next command to execute",
+                isValid: (cmdNameToken: string) => {
+                    if (!cmdNameToken) {
+                        return { isValid: true };
+                    }
+                    cmd = this.commands.find((cmd) => {
+                        return (
+                            cmd.name === cmdNameToken ||
+                            !!cmd.tokens.find((tkn) => tkn === cmdNameToken)
+                        );
+                    })!;
+                    if (!cmd) {
+                        return {
+                            isValid: false,
+                            message: `There is no command with the name or token ${cmdNameToken}`,
+                            tryAgain: true,
+                        };
+                    } else {
+                        return { isValid: true };
+                    }
+                },
+            })
+            .catch((err) => {
+                cliOutputter.pushError(
+                    `Error in getting command:`,
+                    err.toString()
+                );
+                cliOutputter.pushWarning(`Could not get command, so skipping.`);
+            });
         return cmd;
     }
 

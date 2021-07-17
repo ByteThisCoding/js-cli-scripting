@@ -9,9 +9,7 @@ export class ConsoleOutputter implements iCliOutputter {
         cy: "\x1b[36m",
     };
 
-    constructor(
-        private maxDebugLevel: number = Infinity
-    ) {}
+    constructor(private maxDebugLevel: number = Infinity) {}
 
     pushDebug(level: number, ...params: any[]): void {
         if (level > this.maxDebugLevel) {

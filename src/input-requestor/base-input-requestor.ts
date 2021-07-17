@@ -6,7 +6,7 @@ import { iCliOutputter } from "../models/cli-outputter";
 import { iCliUserInputRequestor } from "../models/cli-user-input-requestor";
 
 export abstract class BaseUserInputRequestor implements iCliUserInputRequestor {
-    constructor(protected cliOutputter: iCliOutputter) { }
+    constructor(protected cliOutputter: iCliOutputter) {}
 
     async awaitInput(param: iCliCommandParam): Promise<any> {
         if (param.doRepeat) {
@@ -31,7 +31,7 @@ export abstract class BaseUserInputRequestor implements iCliUserInputRequestor {
         numAttempts = 0
     ): Promise<any> {
         let input: string | boolean;
-        if (param.type && param.type === 'boolean') {
+        if (param.type && param.type === "boolean") {
             input = await this.getBoolean(
                 param.displayText,
                 this.parseBoolean(param.defaultValue || false)
@@ -58,12 +58,21 @@ export abstract class BaseUserInputRequestor implements iCliUserInputRequestor {
     ): any {
         let parsed;
 
-        const isValidDecorator = (err: any, callback?: (parsed: any, numAttempts: number) => { isValid: boolean; message?: string; tryAgain?: boolean; }): ((parsed: any, numAttempts: number) => { isValid: boolean; message?: string; tryAgain?: boolean; }) => {
+        const isValidDecorator = (
+            err: any,
+            callback?: (
+                parsed: any,
+                numAttempts: number
+            ) => { isValid: boolean; message?: string; tryAgain?: boolean }
+        ): ((
+            parsed: any,
+            numAttempts: number
+        ) => { isValid: boolean; message?: string; tryAgain?: boolean }) => {
             if (err) {
                 return (parsed: any, numAttempts: number) => ({
                     isValid: false,
-                    message: 'Error processing user input: ' + err.toString(),
-                    tryAgain: true
+                    message: "Error processing user input: " + err.toString(),
+                    tryAgain: true,
                 });
             } else if (callback) {
                 return (parsed: any, numAttempts: number) => {
@@ -73,16 +82,16 @@ export abstract class BaseUserInputRequestor implements iCliUserInputRequestor {
                         return {
                             isValid: false,
                             message: err.toString(),
-                            tryAgain: true
+                            tryAgain: true,
                         };
                     }
-                }
+                };
             } else {
                 return (parsed: any, numAttempts: number) => ({
-                    isValid: true
+                    isValid: true,
                 });
             }
-        }
+        };
 
         let error = null;
         try {
@@ -140,11 +149,11 @@ export abstract class BaseUserInputRequestor implements iCliUserInputRequestor {
     }
 
     private parseBoolean(input: string | boolean): boolean {
-        if (typeof input === 'boolean') {
+        if (typeof input === "boolean") {
             return input;
         }
 
-        switch (input.toLowerCase().trim()) {
+        switch ((input || "").toLowerCase().trim()) {
             case "y":
             case "yes":
             case "true":

@@ -5,7 +5,6 @@ import { iCliOutputter } from "./cli-outputter";
  * An encapsulation of some action to execute and its required parameters
  */
 export interface iCliCommand {
-    
     //simple name for the command
     name: string;
 
@@ -22,7 +21,7 @@ export interface iCliCommand {
 
     /**
      * Execute the command
-     * @param userParamsInput : dictionary of input params with values provided by the user 
+     * @param userParamsInput : dictionary of input params with values provided by the user
      * @param cliOutputter : object to invoke when outputting data to the console/interface
      */
     execute(

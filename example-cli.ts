@@ -1,14 +1,20 @@
 /**
  * Example application
+ * This file defines some basic commands, then injects everything into the app runner
  */
 
-import { CliApplication } from "./src/cli-application/cli-application";
-import { ArrayCliCommandsCollection } from "./src/cli-commands-collection/cli-commands-collection";
-import { ConsoleUserInputRequestor } from "./src/input-requestor/console-input-requestor";
-import { iCliCommand } from "./src/models/cli-command";
-import { iCliOutputter } from "./src/models/cli-outputter";
-import { ConsoleOutputter } from "./src/outputter/console-outputter";
+import {
+    ArrayCliCommandsCollection,
+    CliApplication,
+    ConsoleOutputter,
+    ConsoleUserInputRequestor,
+    iCliCommand,
+    iCliOutputter,
+} from "./public-api";
 
+/**
+ * Array of the commands which the program will allow the user to execute actions
+ */
 const commands: iCliCommand[] = [
     {
         name: "Print Date",
@@ -81,42 +87,54 @@ const commands: iCliCommand[] = [
             return [
                 {
                     name: "booleanValue",
-                    displayText:
-                        "Enter a boolean value",
-                    type: "boolean"
+                    displayText: "Enter a boolean value",
+                    type: "boolean",
                 },
             ];
         },
-        execute: async (params: {booleanValue: boolean;}, cliOutputter: iCliOutputter) => {
+        execute: async (
+            params: { booleanValue: boolean },
+            cliOutputter: iCliOutputter
+        ) => {
             cliOutputter.pushMessage("Boolean result", params.booleanValue);
-        }
+        },
     },
     {
         name: "Choose Something",
         displayText: "Choose from a list of options",
         tokens: ["ch-s"],
         async getRequiredParams() {
-            return [{
-                name: "choice",
-                displayText: "Make a choice",
-                choices: [{
-                    name: "one",
-                    displayText: "First choice"
-                }, {
-                    name: "two",
-                    displayText: "Second choice"
-                }, {
-                    name: "three",
-                    displayText: "Third choice"
-                }, {
-                    name: "four",
-                    displayText: "Fourth choice"
-                }],
-            }];
+            return [
+                {
+                    name: "choice",
+                    displayText: "Make a choice",
+                    choices: [
+                        {
+                            name: "one",
+                            displayText: "First choice",
+                        },
+                        {
+                            name: "two",
+                            displayText: "Second choice",
+                        },
+                        {
+                            name: "three",
+                            displayText: "Third choice",
+                        },
+                        {
+                            name: "four",
+                            displayText: "Fourth choice",
+                        },
+                    ],
+                },
+            ];
         },
-        execute: async (params: {choice: string;}, cliOutputter: iCliOutputter) => {
+        execute: async (
+            params: { choice: string },
+            cliOutputter: iCliOutputter
+        ) => {
             cliOutputter.pushMessage("Choice result:", params.choice);
-        }
+        },
     },
     {
         name: "Add Numbers",
@@ -143,22 +161,33 @@ const commands: iCliCommand[] = [
     },
 ];
 
-const app = new CliApplication()
+//create the app object
+const app = new CliApplication();
 
+//When quit is dispatched, trigger the process to exit
 app.onQuit(() => {
     process.exit(0);
 });
 
+//create the i/o dependencies
+const outputter = new ConsoleOutputter();
+const inputRequestor = new ConsoleUserInputRequestor(outputter);
+
+//create the app and inject dependencies
 app.startApp(
     {
         startup: {
             initialOutput: "Welcome to the example application",
         },
+        loop: {
+            enabled: true,
+        },
     },
+    //Pass the args into a collection object
     new ArrayCliCommandsCollection(commands),
+    //Pass in the process arguments
     [...process.argv].slice(2),
-    new ConsoleOutputter(),
-    new ConsoleUserInputRequestor(
-        new ConsoleOutputter()
-    )
+    //Use the default console outputter and input requestors
+    outputter,
+    inputRequestor
 );

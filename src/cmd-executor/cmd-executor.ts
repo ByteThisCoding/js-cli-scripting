@@ -9,6 +9,20 @@ export class CliCommandExecutor implements iCliCommandExecutor {
     ) {}
 
     async execute(cliCmd: iCliCommand): Promise<void> {
+        try {
+            const paramsInput = await this.getParams(cliCmd);
+            await cliCmd.execute(paramsInput, this.cliOutputter);
+        } catch (err) {
+            this.cliOutputter.pushError(
+                `Could not execute command:`,
+                err.toString()
+            );
+        }
+    }
+
+    private async getParams(
+        cliCmd: iCliCommand
+    ): Promise<{ [key: string]: any }> {
         const paramsInput: any = {};
         const params = (await cliCmd.getRequiredParams()) || [];
         for (let i = 0; i < params.length; i++) {
@@ -21,7 +35,6 @@ export class CliCommandExecutor implements iCliCommandExecutor {
             }
             paramsInput[param.name] = input;
         }
-
-        await cliCmd.execute(paramsInput, this.cliOutputter);
+        return paramsInput;
     }
 }

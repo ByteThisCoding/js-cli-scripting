@@ -34,7 +34,7 @@ export class CommandExecutorCommand implements iCliCommand {
         userParamsInput: { [key: string]: any },
         cliOutputter: iCliOutputter
     ): Promise<void> {
-        const cmdNameToken = userParamsInput.cmdNameToken.toLowerCase();
+        const cmdNameToken = (userParamsInput.cmdNameToken || "").toLowerCase();
         const cmd = this.commands.find((cmd) => {
             return (
                 cmd.name === cmdNameToken ||

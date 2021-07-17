@@ -1,10 +1,7 @@
 import EventEmitter from "events";
 import { CliCommandExecutor } from "../cmd-executor/cmd-executor";
 import { EVENTS } from "../events/events";
-import {
-    iCliApplication,
-    iCliApplicationOptions,
-} from "../models/cli-application";
+import { iCliApplication } from "../models/cli-application";
 import { iCliCommand } from "../models/cli-command";
 import { iCliOutputter } from "../models/cli-outputter";
 import { iCliUserInputRequestor } from "../models/cli-user-input-requestor";
@@ -15,9 +12,9 @@ import { CommandExecutorCommand } from "./internal-app-commands/cmd-exec-cmd";
 import { MultiCommandExecutorCommand } from "./app-commands/multi-cmd-exec-cmd";
 import { iCliCommandsCollection } from "../models/cli-commands-collection";
 import { ClearScreenCmd } from "./app-commands/clear-screen-cmd";
+import { iCliApplicationOptions } from "../models/cli-application-options";
 
 export class CliApplication implements iCliApplication {
-
     private quitListeners: (() => any)[] = [];
 
     private commandListeners: ((cmd: iCliCommand) => any)[] = [];
@@ -29,13 +26,13 @@ export class CliApplication implements iCliApplication {
     onCommand(callback: (cmd: iCliCommand) => any): void {
         this.commandListeners.push(callback);
     }
-   
+
     async startApp(
         inputOptions: RecursivePartial<iCliApplicationOptions>,
         cliCommandsCollection: iCliCommandsCollection,
         argV: string[],
         cliOutputter: iCliOutputter,
-        cliUserInputRequestor: iCliUserInputRequestor,
+        cliUserInputRequestor: iCliUserInputRequestor
     ): Promise<void> {
         const options: iCliApplicationOptions = {
             appendDefaultCommands: true,
@@ -47,6 +44,7 @@ export class CliApplication implements iCliApplication {
                 ...(inputOptions.startup || {}),
             },
             loop: {
+                enabled: true,
                 outputCommandsTexts: true,
                 ...(inputOptions.loop || {}),
             },
@@ -61,21 +59,18 @@ export class CliApplication implements iCliApplication {
         //if we have command line params, execute directly,
         //otherwise, run loop
         if (options.startup.acceptArgv && argV && argV.length > 0) {
-
-            const {
-                cliCommands,
-                commandExecutorCommand
-            } = await this.getCommands(
-                options,
-                cliCommandsCollection,
-                eventEmitter,
-                cliOutputter,
-                cliUserInputRequestor
-            );
+            const { cliCommands, commandExecutorCommand } =
+                await this.getCommands(
+                    options,
+                    cliCommandsCollection,
+                    eventEmitter,
+                    cliOutputter,
+                    cliUserInputRequestor
+                );
             await this.runFromArgv(argV, cliCommands, cliOutputter);
         } else {
             //output initial commands and texts if options enable this
-            this.loop(
+            this.initLoop(
                 options,
                 cliCommandsCollection,
                 eventEmitter,
@@ -95,7 +90,7 @@ export class CliApplication implements iCliApplication {
         argvExecutor.execute({}, cliOutputter);
     }
 
-    private async loop(
+    private async initLoop(
         options: iCliApplicationOptions,
         cliCommandsCollection: iCliCommandsCollection,
         eventEmitter: EventEmitter,
@@ -108,7 +103,7 @@ export class CliApplication implements iCliApplication {
             eventEmitter,
             cliOutputter,
             cliUserInputRequestor
-        )
+        );
 
         this.outputInitial(options, cliCommands, cliOutputter);
         //start loop
@@ -116,6 +111,10 @@ export class CliApplication implements iCliApplication {
             cliOutputter,
             cliUserInputRequestor
         );
+        if (!options.loop.enabled) {
+            return;
+        }
+
         while (true) {
             await cliCommandExecutor.execute(commandExecutorCommand);
             if (options.loop.outputCommandsTexts) {
@@ -128,7 +127,7 @@ export class CliApplication implements iCliApplication {
                 eventEmitter,
                 cliOutputter,
                 cliUserInputRequestor
-            )
+            );
             cliCommands = updates.cliCommands;
             commandExecutorCommand = updates.commandExecutorCommand;
         }
@@ -149,34 +148,33 @@ export class CliApplication implements iCliApplication {
     }
 
     private listenToEvents(eventEmitter: EventEmitter): void {
-
         eventEmitter.on(EVENTS.quitApp, () => {
-            this.quitListeners.forEach(callback => callback());
+            this.quitListeners.forEach((callback) => callback());
             this.quitListeners = [];
             this.commandListeners = [];
         });
 
         eventEmitter.on(EVENTS.cmdExecuted, (cmd: iCliCommand) => {
-            this.commandListeners.forEach(callback => callback(cmd));
+            this.commandListeners.forEach((callback) => callback(cmd));
         });
     }
 
     /**
      * Get the cli commands
-     * @param options 
-     * @param cliCommandsCollection 
-     * @param eventEmitter 
-     * @param cliUserInputRequestor 
+     * @param options
+     * @param cliCommandsCollection
+     * @param eventEmitter
+     * @param cliUserInputRequestor
      */
     private async getCommands(
         options: iCliApplicationOptions,
         cliCommandsCollection: iCliCommandsCollection,
         eventEmitter: EventEmitter,
         cliOutputter: iCliOutputter,
-        cliUserInputRequestor: iCliUserInputRequestor,
+        cliUserInputRequestor: iCliUserInputRequestor
     ): Promise<{
         cliCommands: iCliCommand[];
-        commandExecutorCommand: CommandExecutorCommand
+        commandExecutorCommand: CommandExecutorCommand;
     }> {
         const cliCommands = [...(await cliCommandsCollection.getCommands())];
         //add default commands
@@ -194,16 +192,13 @@ export class CliApplication implements iCliApplication {
 
         const commandExecutorCommand = new CommandExecutorCommand(
             cliCommands,
-            new CliCommandExecutor(
-                cliOutputter,
-                cliUserInputRequestor
-            ),
+            new CliCommandExecutor(cliOutputter, cliUserInputRequestor),
             eventEmitter
         );
 
         return {
             cliCommands,
-            commandExecutorCommand
+            commandExecutorCommand,
         };
     }
 }

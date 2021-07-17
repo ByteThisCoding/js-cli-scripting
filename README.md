@@ -38,7 +38,7 @@ With this kind of definition, the program will request everything under **requir
 Then, we setup our application runner:
 
 ```typescript
-const app = new CliApplication()
+const app = new CliApplication();
 
 app.onQuit(() => {
     process.exit(0);
@@ -53,8 +53,6 @@ app.startApp(
     new ArrayCliCommandsCollection(commands),
     [...process.argv].slice(2),
     new ConsoleOutputter(),
-    new ConsoleUserInputRequestor(
-        new ConsoleOutputter()
-    )
+    new ConsoleUserInputRequestor(new ConsoleOutputter())
 );
 ```

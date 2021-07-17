@@ -15,7 +15,7 @@ export interface iCliCommandParam {
 
     //description of the parameter
     displayText: string;
-    
+
     //type of the parameter
     //if not string, the system will parse to the appropriate type
     type?: "string" | "number" | "boolean";

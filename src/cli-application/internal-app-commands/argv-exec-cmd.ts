@@ -23,7 +23,7 @@ export class ArgvCommandExecutorCommand implements iCliCommand {
         userParamsInput: {},
         cliOutputter: iCliOutputter
     ): Promise<void> {
-        const cmdNameToken = this.args[0].toLowerCase();
+        const cmdNameToken = (this.args[0] || "").toLowerCase();
         const cmd = this.commands.find((cmd) => {
             return (
                 cmd.name === cmdNameToken ||
