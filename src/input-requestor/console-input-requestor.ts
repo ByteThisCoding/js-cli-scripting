@@ -32,7 +32,7 @@ export class ConsoleUserInputRequestor extends BaseUserInputRequestor {
                     displayText: "Yes",
                 },
                 {
-                    name: "yes",
+                    name: "no",
                     displayText: "No",
                 },
             ],
