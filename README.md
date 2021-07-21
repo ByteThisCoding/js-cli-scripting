@@ -2,6 +2,8 @@
 
 Streamline the process of creating a CLI using javascript / typescript.
 
+**For a demo + instructions on how to use**: https://bytethisstore.com/articles/pg/js-cli
+
 ## Getting Started
 
 This readme will outline how to use this project. If you'd like to view an example, or just jump in, the **example-cli.ts** script contains
