@@ -2,6 +2,12 @@ import { iCliCommandParamChoice } from "../models/cli-command-param";
 import { iCliOutputter } from "../models/cli-outputter";
 import { BaseUserInputRequestor } from "./base-input-requestor";
 
+/**
+ * This subclass provides functionality specific to getting user input from a command line terminal
+ * This implementation lets us integrate in a decoupled manner
+ * : a callback for each event is registered in the constructor and invoked when the input requestor is invoked
+ * : the callback will return a promise which resolves to the user input
+ */
 export class CallbackInputRequestor extends BaseUserInputRequestor {
     static events: {
         getInput: "getInput";
@@ -20,6 +26,9 @@ export class CallbackInputRequestor extends BaseUserInputRequestor {
         super(cliOutputter);
     }
 
+    /**
+     * Implementing the abstract method based on what we need for this specific context
+     */
     protected async getInput(
         displayText: string,
         defaultValue?: string,
@@ -33,6 +42,9 @@ export class CallbackInputRequestor extends BaseUserInputRequestor {
         ) as Promise<string>;
     }
 
+    /**
+     * Implementing the abstract method based on what we need for this specific context
+     */
     protected async getBoolean(
         displayText: string,
         defaultValue?: boolean
