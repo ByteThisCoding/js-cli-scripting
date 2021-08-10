@@ -5,9 +5,42 @@ import {
 import { iCliOutputter } from "../models/cli-outputter";
 import { iCliUserInputRequestor } from "../models/cli-user-input-requestor";
 
+/**
+ * Abstract class which defines common functionality for input requestors.
+ * Subclasses will extend this and implement their own functionality to get user input
+ * This follows the Template Pattern
+ */
 export abstract class BaseUserInputRequestor implements iCliUserInputRequestor {
+
+    /**
+     * A CliOutputter is needed to present output such as questions / input texts
+     */
     constructor(protected cliOutputter: iCliOutputter) {}
 
+    /**
+     * Get a single string input from the user
+     * If choices array is not nothing, then present them as a list the user can choose from
+     * Subclass will implement this functionality (templated)
+     */
+    protected abstract getInput(
+        displayText: string,
+        defaultValue?: string,
+        choices?: iCliCommandParamChoice[]
+    ): Promise<string>;
+
+    /**
+     * Get a boolean input value from the user
+     * Subclass will implement this functionality (templated)
+     */
+    protected abstract getBoolean(
+        displayText: string,
+        defaultValue?: boolean
+    ): Promise<boolean>;
+
+    /**
+     * Await input from the user, then validate the input
+     * If invalid, try again or quit, depending upon state
+     */
     async awaitInput(param: iCliCommandParam): Promise<any> {
         if (param.doRepeat) {
             const results: any = [];
@@ -26,6 +59,10 @@ export abstract class BaseUserInputRequestor implements iCliUserInputRequestor {
         }
     }
 
+    /**
+     * Await a single string / boolean input
+     * Return void 0 if empty
+     */
     protected async awaitSingleInput(
         param: iCliCommandParam,
         numAttempts = 0
@@ -51,6 +88,9 @@ export abstract class BaseUserInputRequestor implements iCliUserInputRequestor {
         }
     }
 
+    /**
+     * Once input is received, this will be invoked to validate the input
+     */
     protected parseValidateInput(
         param: iCliCommandParam,
         input: string,
@@ -126,18 +166,7 @@ export abstract class BaseUserInputRequestor implements iCliUserInputRequestor {
             return this.awaitSingleInput(param, numAttempts + 1);
         }
     }
-
-    protected abstract getInput(
-        displayText: string,
-        defaultValue?: string,
-        choices?: iCliCommandParamChoice[]
-    ): Promise<string>;
-
-    protected abstract getBoolean(
-        displayText: string,
-        defaultValue?: boolean
-    ): Promise<boolean>;
-
+    
     private parseNumber(input: string): number {
         const result = parseFloat(input);
         if (isNaN(result)) {
