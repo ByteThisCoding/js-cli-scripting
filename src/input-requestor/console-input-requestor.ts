@@ -7,7 +7,14 @@ const tryRequire = require("try-require");
 const enquirer = tryRequire("enquirer");
 const prompt = enquirer ? enquirer.prompt : null;
 
+/**
+ * This subclass provides functionality specific to getting user input from a command line terminal
+ */
 export class ConsoleUserInputRequestor extends BaseUserInputRequestor {
+
+    /**
+     * Implementing the abstract method based on what we need for this specific context
+     */
     protected getInput(
         displayText: string,
         defaultValue?: string,
@@ -20,6 +27,9 @@ export class ConsoleUserInputRequestor extends BaseUserInputRequestor {
         }
     }
 
+    /**
+     * Implementing the abstract method based on what we need for this specific context
+     */
     protected async getBoolean(
         displayText: string,
         defaultValue?: boolean
